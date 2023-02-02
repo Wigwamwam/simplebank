@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -9,9 +10,10 @@ import (
 
 func TestTransfer(t *testing.T) {
 	store := NewStore(testDB)
+
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
-
+	fmt.Println(">>before:", account1.Balance, account2.Balance)
 	// run n conconcurrent transfer transcations
 
 	n := 5
@@ -22,11 +24,14 @@ func TestTransfer(t *testing.T) {
 
 	for i := 0; i < n; i++ {
 		go func() {
-			result, err := store.TransferTx(context.Background(), TransferTxParams{
+			// this will hold the transcation name
+			ctx := context.Background()
+			result, err := store.TransferTx(ctx, TransferTxParams{
 				FromAccountID: account1.ID,
 				ToAccountID:   account2.ID,
 				Amount:        amount,
 			})
+
 			errs <- err
 			results <- result
 		}()
@@ -76,6 +81,7 @@ func TestTransfer(t *testing.T) {
 		_, err = store.GetEntry(context.Background(), toEntry.ID)
 		require.NoError(t, err)
 
+
 		// check accounts
 		fromAccount := result.FromAccount
 		require.NotEmpty(t, fromAccount)
@@ -86,9 +92,9 @@ func TestTransfer(t *testing.T) {
 		require.Equal(t, account2.ID, toAccount.ID)
 
 		// check accounts balance
+		fmt.Println(">>tx:", fromAccount.Balance, toAccount.Balance)
 		diff1 := account1.Balance - fromAccount.Balance
 		diff2 := toAccount.Balance - account2.Balance
-
 		require.Equal(t, diff1, diff2)
 		require.True(t, diff1 > 0)
 		require.True(t, diff1 % amount == 0)
@@ -104,7 +110,7 @@ func TestTransfer(t *testing.T) {
 
 	updatedAccount2, err := testQueries.GetAccount(context.Background(), account2.ID)
 	require.NoError(t, err)
-
+	fmt.Println(">>after:", updatedAccount1.Balance, updatedAccount2.Balance)
 	require.Equal(t, account1.Balance-int64(n)*amount, updatedAccount1.Balance)
 	require.Equal(t, account2.Balance+int64(n)*amount, updatedAccount2.Balance)
 }
