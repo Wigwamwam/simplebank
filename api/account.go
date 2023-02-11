@@ -12,7 +12,7 @@ import (
 // using validations that do not include gin
 type createAccountRequest struct {
 	Owner    string `json:"owner" binding:"required"`
-	Currency string `json:"currency" binding:"required,oneof=USD EUR"`
+	Currency string `json:"currency" binding:"required,currency"`
 }
 
 func (server *Server) createAccount(ctx *gin.Context) {
@@ -95,7 +95,7 @@ type updateAccountRequest struct {
 }
 
 type updateAccountID struct {
-	ID      int64 `uri:"id" binding:"required,min=1"`
+	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
 func (server *Server) updateAccount(ctx *gin.Context) {
@@ -112,7 +112,7 @@ func (server *Server) updateAccount(ctx *gin.Context) {
 	}
 
 	arg := db.UpdateAccountParams{
-		ID: reqID.ID,
+		ID:      reqID.ID,
 		Balance: reqBody.Balance,
 	}
 

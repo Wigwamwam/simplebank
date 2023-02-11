@@ -15,7 +15,7 @@ type Store interface {
 
 
 //called composition
-
+// what is composition?
 type SQLStore struct {
 	db *sql.DB
 	*Queries
