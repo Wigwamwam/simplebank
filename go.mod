@@ -4,8 +4,6 @@ go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.8.2
-	github.com/go-chi/chi v1.5.4
-	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-playground/validator/v10 v10.11.2
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.7

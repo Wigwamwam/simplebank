@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type errorResponse struct {
@@ -27,7 +29,9 @@ func respondWithJSON(w http.ResponseWriter, code int, response []byte) {
 
 func handleAppError(w http.ResponseWriter, err error) {
 	switch err.(type) {
-		
+	case validator.ValidationErrors:
+		respondWithError(w, http.StatusBadRequest, err)
+		return
 	default:
 		respondWithError(w, http.StatusInternalServerError, err)
 		return
